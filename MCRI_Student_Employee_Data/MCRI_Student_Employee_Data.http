@@ -1,0 +1,55 @@
+@host = http://localhost:5121
+
+### GET api/people
+GET {{host}}/api/people
+
+### GET api/people - search by name
+GET {{host}}/api/people?search=grace
+
+### GET api/people - filter by Student or Employee
+GET {{host}}/api/people?personType=Student
+
+### GET api/people/{id}
+GET {{host}}/api/people/1
+
+### POST api/people
+POST {{host}}/api/people
+Content-Type: application/json
+
+{
+  "firstName": "Anesu",
+  "lastName": "Chirwa",
+  "personType": "Student",
+  "departmentOrProgramme": "BSc Computer Science",
+  "email": "anesu.chirwa@students.mcri.org",
+  "funFact": "Learned to code on a borrowed laptop.",
+  "imageUrl": null
+}
+
+### PUT api/people/{id}
+PUT {{host}}/api/people/1
+Content-Type: application/json
+
+{
+  "firstName": "Benon",
+  "lastName": "Marava",
+  "personType": "Employee",
+  "departmentOrProgramme": "Software Engineering",
+  "email": "benon.marava@mcri.org",
+  "funFact": "Runs the SDLC workshop.",
+  "imageUrl": null
+}
+
+### DELETE api/people/{id}
+DELETE {{host}}/api/people/10
+
+### POST api/people/{id}/image
+POST {{host}}/api/people/1/image
+Content-Type: multipart/form-data; boundary=Boundary
+
+--Boundary
+Content-Disposition: form-data; name="file"; filename="profile.jpg"
+Content-Type: image/jpeg
+
+< ./profile.jpg
+--Boundary--
