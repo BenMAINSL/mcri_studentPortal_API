@@ -13,7 +13,9 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "MCRI_Student_Employee_Data.dll"]
+# Render injects the port it expects the container to listen on as PORT, so the app
+# binds to that rather than a hard-coded number. The 8080 fallback keeps
+# "docker run -p 8080:8080" working locally.
+ENTRYPOINT ["sh", "-c", "exec dotnet MCRI_Student_Employee_Data.dll --urls http://0.0.0.0:${PORT:-8080}"]

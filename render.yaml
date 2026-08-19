@@ -1,0 +1,24 @@
+# Render Blueprint. In Render: New -> Blueprint -> pick this repo, and it creates the
+# service below. The four sync: false values are prompted for on first deploy and are
+# never stored in the repo.
+services:
+  - type: web
+    name: mcri-people-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: frankfurt
+    branch: master
+    healthCheckPath: /healthz
+    envVars:
+      - key: Database__Provider
+        value: Postgres
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Supabase__Url
+        sync: false
+      - key: Supabase__Key
+        sync: false
+      - key: Supabase__Bucket
+        value: profile-images

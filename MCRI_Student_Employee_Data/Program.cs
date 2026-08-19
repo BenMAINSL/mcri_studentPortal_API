@@ -2,13 +2,30 @@ using System.Text.Json.Serialization;
 using MCRI_Student_Employee_Data.Data;
 using MCRI_Student_Employee_Data.Repositories;
 using MCRI_Student_Employee_Data.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Database (local SQL Server for now; Supabase PostgreSQL for the workshop deployment)
+// Database. Local development runs on SQL Server LocalDB, the deployed app runs on
+// Supabase PostgreSQL. "Database:Provider" picks between them, so the only thing that
+// changes between the two is configuration.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
+
+var provider = builder.Configuration["Database:Provider"] ?? "SqlServer";
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (provider.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseSqlServer(connectionString);
+    }
+});
 
 // Controllers -> Services -> Repositories
 builder.Services.AddScoped<IPersonService, PersonService>();
@@ -32,7 +49,19 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowAnyMethod()));
 
+// Render terminates HTTPS at its edge and forwards over plain HTTP. Honouring the
+// X-Forwarded-* headers keeps the app aware that the original request was HTTPS, so
+// Swagger builds https:// URLs instead of http:// ones the browser then blocks.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -43,5 +72,9 @@ app.MapControllers();
 
 // Opening the base URL lands on Swagger instead of a 404.
 app.MapGet("/", () => Results.Redirect("/swagger"));
+
+// Render pings this to decide whether the instance is live. It deliberately does not
+// touch the database, so a database problem does not get the container restarted.
+app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
 
 app.Run();

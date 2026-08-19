@@ -26,11 +26,14 @@ public class PersonRepository : IPersonRepository
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            // SQL Server's default collation is case-insensitive, so LIKE is enough.
-            var term = $"%{search.Trim()}%";
+            // Lower-casing both sides keeps the search case-insensitive on either
+            // provider. SQL Server's default collation ignores case on its own, but
+            // PostgreSQL's LIKE does not, so relying on the collation would mean
+            // "gra" finding Grace locally and nothing at all once deployed.
+            var term = search.Trim().ToLower();
             query = query.Where(p =>
-                EF.Functions.Like(p.FirstName, term) ||
-                EF.Functions.Like(p.LastName, term));
+                p.FirstName.ToLower().Contains(term) ||
+                p.LastName.ToLower().Contains(term));
         }
 
         return await query
