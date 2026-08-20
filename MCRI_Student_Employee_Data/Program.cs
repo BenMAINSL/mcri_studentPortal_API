@@ -43,11 +43,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
+//builder.Services.AddCors(options =>
+//    options.AddDefaultPolicy(policy => policy
+//      .WithOrigins("http://localhost:5173")
+//        .AllowAnyOrigin()
+//        .AllowAnyHeader()
+//        .AllowAnyMethod()));
+
 builder.Services.AddCors(options =>
-    options.AddDefaultPolicy(policy => policy
-        .AllowAnyOrigin()
-        .AllowAnyHeader()
-        .AllowAnyMethod()));
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // Render terminates HTTPS at its edge and forwards over plain HTTP. Honouring the
 // X-Forwarded-* headers keeps the app aware that the original request was HTTPS, so
@@ -66,7 +78,7 @@ app.UseForwardedHeaders();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors();
+app.UseCors("AllowFrontend");
 
 app.MapControllers();
 
