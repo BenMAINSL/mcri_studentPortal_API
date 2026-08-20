@@ -13,25 +13,87 @@ public class AppDbContext : DbContext
 
     // Mirrors the People table created by Database/MCRI_People_SqlServer.sql.
     // The table and its rows already exist, so there is no seeding here.
+    //protected override void OnModelCreating(ModelBuilder modelBuilder)
+    //{
+    //    modelBuilder.Entity<Person>(entity =>
+    //    {
+    //        entity.ToTable("People");
+
+    //        entity.HasIndex(e => e.PersonType, "IX_People_PersonType");
+
+    //        entity.Property(e => e.FirstName).HasMaxLength(100);
+    //        entity.Property(e => e.LastName).HasMaxLength(100);
+    //        entity.Property(e => e.PersonType).HasMaxLength(20);
+    //        entity.Property(e => e.DepartmentOrProgramme).HasMaxLength(150);
+    //        entity.Property(e => e.Email).HasMaxLength(200);
+    //        entity.Property(e => e.FunFact).HasMaxLength(500);
+    //        entity.Property(e => e.ImageUrl).HasMaxLength(500);
+    //        entity.Property(e => e.Gender).HasMaxLength(50);
+    //        entity.Property(e => e.Cohort).HasMaxLength(100);
+    //        entity.Property(e => e.Phase).HasMaxLength(100);
+    //        entity.Property(e => e.ImageContentType).HasMaxLength(100);
+    //    });
+    //}
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Person>(entity =>
         {
             entity.ToTable("People");
 
+            entity.HasKey(e => e.Id);
+
             entity.HasIndex(e => e.PersonType, "IX_People_PersonType");
 
-            entity.Property(e => e.FirstName).HasMaxLength(100);
-            entity.Property(e => e.LastName).HasMaxLength(100);
-            entity.Property(e => e.PersonType).HasMaxLength(20);
-            entity.Property(e => e.DepartmentOrProgramme).HasMaxLength(150);
-            entity.Property(e => e.Email).HasMaxLength(200);
-            entity.Property(e => e.FunFact).HasMaxLength(500);
-            entity.Property(e => e.ImageUrl).HasMaxLength(500);
-            entity.Property(e => e.Gender).HasMaxLength(50);
-            entity.Property(e => e.Cohort).HasMaxLength(100);
-            entity.Property(e => e.Phase).HasMaxLength(100);
-            entity.Property(e => e.ImageContentType).HasMaxLength(100);
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+
+            entity.Property(e => e.FirstName)
+                .HasColumnName("first_name")
+                .HasMaxLength(100);
+
+            entity.Property(e => e.LastName)
+                .HasColumnName("last_name")
+                .HasMaxLength(100);
+
+            entity.Property(e => e.PersonType)
+                .HasColumnName("person_type")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.DepartmentOrProgramme)
+                .HasColumnName("department_or_programme")
+                .HasMaxLength(150);
+
+            entity.Property(e => e.Email)
+                .HasColumnName("email")
+                .HasMaxLength(200);
+
+            entity.Property(e => e.FunFact)
+                .HasColumnName("fun_fact")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.ImageUrl)
+                .HasColumnName("image_url")
+                .HasMaxLength(500);
+
+            entity.Property(e => e.Gender)
+                .HasColumnName("gender")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Cohort)
+                .HasColumnName("cohort")
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Phase)
+                .HasColumnName("phase")
+                .HasMaxLength(100);
+
+            entity.Property(e => e.ImageData)
+                .HasColumnName("image_data");
+
+            entity.Property(e => e.ImageContentType)
+                .HasColumnName("image_content_type")
+                .HasMaxLength(100);
         });
     }
 }
